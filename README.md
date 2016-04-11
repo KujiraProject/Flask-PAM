@@ -26,30 +26,30 @@ in virtualenv's directory.
 Firstly, you have initialize `flask_pam.Auth` object and choose storage type for
 tokens and type of token:
 
-		from flask import Flask
-
+    from flask import Flask
+     
     from flask_pam import Auth
-		from flask_pam.token import Simple
-		from flask_pam.token_storage import DictStorage
+    from flask_pam.token import Simple
+    from flask_pam.token_storage import DictStorage
 
-		app = Flask(__name__)
-		auth = Auth(DictStorage, Simple, app)
+    app = Flask(__name__)
+    auth = Auth(DictStorage, Simple, app)
 
 When you write a view which requires authentication, you have to use
 `auth_required` decorator:
 
-		@app.route('/protected')
-		@auth.auth_requied
-		def protected_view():
-				....
+    @app.route('/protected')
+    @auth.auth_requied
+    def protected_view():
+        ....
 
 When you want to require user to be a member of some group, you use
 `group_required` decorator.
 
     @app.route('/group_protected')
-		@auth.group_protected('wheel')
-		def group_protected_view():
-				....
+    @auth.group_protected('wheel')
+    def group_protected_view():
+        ....
 
 ***Important!*** User who runs Flask application need to have access to
 `/etc/shadow` file. In some cases it's only needed to add that user to `shadow`
