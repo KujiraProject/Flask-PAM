@@ -2,12 +2,11 @@
 
 import simplepam
 import grp
-import pwd
 import functools
 from datetime import datetime, timedelta
 from flask import request, abort
 
-class Auth:
+class Auth(object):
     """Plugin for Flask which implements PAM authentication with tokens."""
 
     def __init__(self, token_storage_type, token_type, app = None):

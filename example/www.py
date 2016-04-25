@@ -1,4 +1,4 @@
-from flask import Flask, request, session
+from flask import Flask, request
 from flask_pam import Auth
 from flask_pam.token_storage import DictStorage
 from flask_pam.token import Simple
