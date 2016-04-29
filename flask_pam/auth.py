@@ -52,14 +52,16 @@ class Auth(object):
 
         return (False, None)
 
-    def authenticated(self, user_token):
+    def authenticated(self, user_token, **validation_context):
         """Checks if user is authenticated using token passed in argument
         user_token.
 
         :param user_token: string representing token
+
+        :param validation_context: Token.validate optional keyword arguments
         """
         token = self.token_storage.get(user_token)
-        if token and token.validate(user_token):
+        if token and token.validate(user_token, **validation_context):
             return True
 
         return False
