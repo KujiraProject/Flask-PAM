@@ -35,12 +35,12 @@ def protected():
     return json.dumps({'status': True})
 
 @app.route('/group1_protected', methods=['POST', 'GET'])
-@auth.group_required(www_config.group1)
+@auth.group_required(www_config.groups[0])
 def gprotected1():
     return json.dumps({'status': True, 'group': www_config.group1})
 
 @app.route('/group2_protected', methods=['POST', 'GET'])
-@auth.group_required(www_config.group2)
+@auth.group_required(www_config.groups[1])
 def gprotected2():
     return json.dumps({'status': True, 'group': www_config.group2})
 
