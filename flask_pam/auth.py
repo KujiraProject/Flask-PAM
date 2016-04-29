@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from flask import request, abort
 
 class Auth(object):
+
     """Plugin for Flask which implements PAM authentication with tokens."""
 
     def __init__(self, token_storage_type, token_type, token_lifetime, app):
@@ -34,7 +35,9 @@ class Auth(object):
         self.app = app
 
     def authenticate(self, username, password, **token_context):
-        """This function calls simplepam's authenticate function and returns
+        """Performs authentication using simplepam
+        
+        This function calls simplepam's authenticate function and returns
         status of authentication using PAM and token object (of type
         self.token_type)
 
@@ -53,7 +56,9 @@ class Auth(object):
         return (False, None)
 
     def authenticated(self, user_token):
-        """Checks if user is authenticated using token passed in argument
+        """Checks if user is authenticated
+        
+        Checks if user is authenticated using token passed in argument
         user_token.
 
         :param user_token: string representing token
@@ -93,7 +98,9 @@ class Auth(object):
 
     # decorators
     def auth_required(self, view):
-        """Decorator for Flask's view which blocks not authenticated requests
+        """Decorator which checks if user is authenticated
+        
+        Decorator for Flask's view which blocks not authenticated requests
 
         :param view: Flask's view function
         """
@@ -109,7 +116,9 @@ class Auth(object):
         return decorated
 
     def group_required(self, group):
-        """Decorator for Flask's view which blocks requests from not
+        """Decorator which checks if user is in group
+
+        Decorator for Flask's view which blocks requests from not
         authenticated users or if user is not member of specified group
 
         :param group: group's name

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 class Token(object):
+
     """Base class for all token's implementations."""
 
     def __init__(self, secret_key, username, expire, **context):
@@ -29,5 +30,5 @@ class Token(object):
         raise NotImplementedError("Token::generate must be implemented!")
 
     def validate(self, token):
-        """Checks if provided token is valid """
+        """Checks if provided token is valid"""
         return token == self.generate()

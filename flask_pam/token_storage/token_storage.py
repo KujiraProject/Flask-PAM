@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
 class TokenStorage(object):
-    """Base class for all implementations for tokens' storage interfaces.
-    It must check if token hasn't expired!
-    """
+
+    """Base class for all implementations for tokens' storage interfaces."""
 
     def set(self, token):
         """Adds token to storage

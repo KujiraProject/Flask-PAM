@@ -4,7 +4,9 @@ from token_storage import TokenStorage
 from datetime import datetime
 
 class DictStorage(TokenStorage):
+
     """Tokens' storage which uses Python's dictionaries"""
+
     def __init__(self):
         self.tokens = {}
         self.users = {}
