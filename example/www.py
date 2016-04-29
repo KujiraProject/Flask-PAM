@@ -1,13 +1,13 @@
 from flask import Flask, request
 from flask_pam import Auth
 from flask_pam.token_storage import DictStorage
-from flask_pam.token import Simple
+from flask_pam.token import JWT
 import json
 import www_config
 
 app = Flask(__name__)
 app.secret_key = 'test_secret_key'
-auth = Auth(DictStorage, Simple, 60, app)
+auth = Auth(DictStorage, JWT, 60, app)
 
 @app.route('/')
 def index():
@@ -27,7 +27,9 @@ def authenticate():
         username = request.form['username'].encode('ascii')
         password = request.form['password'].encode('ascii')
 
-        result = auth.authenticate(username, password)
+        result = auth.authenticate(username, password,
+                                   ip=request.remote_addr)
+                                   
 
         role = None
         user_groups = auth.get_groups(username)

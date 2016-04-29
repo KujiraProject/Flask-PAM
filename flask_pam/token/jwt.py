@@ -21,10 +21,14 @@ class JWT(Token):
                           self.secret_key,
                           algorithm=self.algorithm)
 
-    def validate(self, token):
+    def validate(self, token, **validation_context):
         context = jwt.decode(token,
                              self.secret_key,
                              algorithms=[self.algorithm])
 
-        return context == self.context
+        if ('ip' in validation_context and
+            not context['ip'] == validation_context['ip']):
+            return False
+
+        return True
         
