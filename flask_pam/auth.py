@@ -30,7 +30,7 @@ class Auth(object):
         """
         self.app = app
 
-    def authenticate(self, username, password):
+    def authenticate(self, username, password, **token_context):
         """This function calls simplepam's authenticate function and returns
         status of authentication using PAM and token object (of type
         self.token_type)
@@ -38,10 +38,12 @@ class Auth(object):
         :param username: username in Linux
 
         :param password: password for username
+
+        :param **token_context: additional args with keys for token generator
         """
         if simplepam.authenticate(username, password):
             expire = datetime.now() + timedelta(minutes=30)
-            token = self.token_type(request, username, expire)
+            token = self.token_type(self.app.secret_key, username, expire, **token_context)
             self.token_storage.set(token)
             return (True, token)
 
