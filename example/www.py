@@ -7,7 +7,7 @@ import www_config
 
 app = Flask(__name__)
 app.secret_key = 'test_secret_key'
-auth = Auth(DictStorage, Simple, app)
+auth = Auth(DictStorage, Simple, 60, app)
 
 @app.route('/')
 def index():

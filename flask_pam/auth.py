@@ -9,7 +9,7 @@ from flask import request, abort
 class Auth(object):
     """Plugin for Flask which implements PAM authentication with tokens."""
 
-    def __init__(self, token_storage_type, token_type, app = None):
+    def __init__(self, token_storage_type, token_type, token_lifetime, app):
         """Initialization of Auth object
         
         :param token_storage_type: type which derives from
@@ -17,10 +17,13 @@ class Auth(object):
 
         :param token_type: type which derives from token.Token
 
+        :param token_lifetime: time interval in which token will be valid (in seconds)
+
         :param app: Flask class' instance
         """
         self.token_type = token_type
         self.token_storage = token_storage_type()
+        self.token_lifetime = token_lifetime
         self.init_app(app)
 
     def init_app(self, app):
@@ -42,7 +45,7 @@ class Auth(object):
         :param **token_context: additional args with keys for token generator
         """
         if simplepam.authenticate(username, password):
-            expire = datetime.now() + timedelta(minutes=30)
+            expire = datetime.now() + timedelta(seconds=self.token_lifetime)
             token = self.token_type(self.app.secret_key, username, expire, **token_context)
             self.token_storage.set(token)
             return (True, token)
