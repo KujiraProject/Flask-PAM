@@ -7,10 +7,10 @@ from os import urandom
 class JWT(Token):
     """JSON Web Token"""
 
-    def __init__(self, algorithm = 'HS256', *args, **kwargs):
-        super(Token, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(JWT, self).__init__(*args, **kwargs)
 
-        self.algorithm = algorithm
+        self.algorithm = 'HS256'
         self.context['username'] = self.username
 
         if not 'salt' in self.context:
