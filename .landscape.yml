@@ -1,0 +1,14 @@
+dodgy:
+  run: true
+
+pyflakes:
+  run: false
+
+mccabe:
+  run: true
+
+pep257:
+  run: true
+
+pep8:
+  run: true
