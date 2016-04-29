@@ -14,7 +14,7 @@ class JWT(Token):
         self.context['username'] = self.username
 
         if not 'salt' in self.context:
-            self.context['salt'] = urandom(256)
+            self.context['salt'] = urandom(256).encode('base-64')
 
     def generate(self):
         return jwt.encode(self.context,
