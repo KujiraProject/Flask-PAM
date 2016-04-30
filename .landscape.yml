@@ -2,7 +2,10 @@ dodgy:
   run: true
 
 pyflakes:
-  run: false
+  run: true
+
+  disable:
+    - 'F401'
 
 mccabe:
   run: true
