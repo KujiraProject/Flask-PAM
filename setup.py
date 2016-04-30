@@ -11,5 +11,6 @@ setup(name='Flask-PAM',
       install_requires=[
         'simplepam>=0.1.5',
         'Flask>=0.10.1',
+        'python-jose>=0.6.1',
       ],    
 )
