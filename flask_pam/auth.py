@@ -10,7 +10,7 @@ class Auth(object):
 
     """Plugin for Flask which implements PAM authentication with tokens."""
 
-    def __init__(self, token_storage_type, token_type, token_lifetime, app):
+    def __init__(self, token_storage_type, token_type, token_lifetime, app, development = False):
         """Initialization of Auth object
         
         :param token_storage_type: type which derives from
@@ -21,11 +21,15 @@ class Auth(object):
         :param token_lifetime: time interval in which token will be valid (in seconds)
 
         :param app: Flask class' instance
+
+        :param development: flag - turning it on will always result in correct authentication
+                            in decorators: auth_required and group_required
         """
         self.token_type = token_type
         self.token_storage = token_storage_type()
         self.token_lifetime = token_lifetime
         self.init_app(app)
+        self.development = development
 
     def init_app(self, app):
         """Saves Flask class' instance in self.app
@@ -108,7 +112,7 @@ class Auth(object):
         def decorated(*args, **kwargs):
             if request.method == 'POST':
                 token = request.form['token']
-                if self.authenticated(token):
+                if self.development or self.authenticated(token):
                     return view(*args, **kwargs)
 
             return abort(403)
@@ -128,7 +132,7 @@ class Auth(object):
             def decorated(*args, **kwargs):
                 if request.method == 'POST':
                     token = request.form['token']
-                    if self.group_authenticated(token, group):
+                    if self.development or self.group_authenticated(token, group):
                         return view(*args, **kwargs)
 
                 return abort(403)
