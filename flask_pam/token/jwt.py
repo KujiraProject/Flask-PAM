@@ -11,13 +11,12 @@ class JWT(Token):
         super(JWT, self).__init__(*args, **kwargs)
 
         self.algorithm = 'HS256'
-        self.context['username'] = self.username
-
-        if not 'salt' in self.context:
-            self.context['salt'] = urandom(256).encode('base-64')
 
     def generate(self):
-        return jwt.encode(self.context,
+        data = self.context.copy()
+        data['username'] = self.username
+
+        return jwt.encode(data,
                           self.secret_key,
                           algorithm=self.algorithm)
 
