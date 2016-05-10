@@ -7,4 +7,4 @@ class Simple(Token):
     """Simple token implementation. It's not safe. Only for testing purposes!"""
 
     def generate(self):
-        return sha256(self.username).hexdigest()
+        return sha256(self.username + str(self.context)).hexdigest()

@@ -5,12 +5,16 @@ import grp
 import functools
 from datetime import datetime, timedelta
 from flask import request, abort
+from os import urandom
 
 class Auth(object):
 
     """Plugin for Flask which implements PAM authentication with tokens."""
 
-    def __init__(self, token_storage_type, token_type, token_lifetime, app, development = False):
+    def __init__(self,
+                 token_storage_type, token_type,
+                 token_lifetime, refresh_token_lifetime,
+                 app, development = False):
         """Initialization of Auth object
         
         :param token_storage_type: type which derives from
@@ -20,6 +24,8 @@ class Auth(object):
 
         :param token_lifetime: time interval in which token will be valid (in seconds)
 
+        :param refresh_token_lifetime: time interval in which refresh token will be valid (in seconds)
+
         :param app: Flask class' instance
 
         :param development: flag - turning it on will always result in correct authentication
@@ -27,7 +33,9 @@ class Auth(object):
         """
         self.token_type = token_type
         self.token_storage = token_storage_type()
+        self.refresh_token_storage = token_storage_type()
         self.token_lifetime = token_lifetime
+        self.refresh_token_lifetime = refresh_token_lifetime
         self.init_app(app)
         self.development = development
 
@@ -53,9 +61,36 @@ class Auth(object):
         """
         if simplepam.authenticate(username, password):
             expire = datetime.now() + timedelta(seconds=self.token_lifetime)
+            refresh_expire = -1
+            if self.refresh_token_lifetime != -1:
+                refresh_expire = datetime.now() + timedelta(seconds=self.refresh_token_lifetime)
+
             token = self.token_type(self.app.secret_key, username, expire, **token_context)
+
+            refresh_context = token_context.copy()
+            refresh_context['refresh'] = 0
+            refresh_context['refresh_salt'] = urandom(120).encode('base-64')
+            refresh_token = self.token_type(self.app.secret_key, username, refresh_expire, **refresh_context)
+
             self.token_storage.set(token)
-            return (True, token)
+            self.refresh_token_storage.set(refresh_token)
+            return (True, token, refresh_token)
+
+        return (False, None, None)
+
+    def refresh(self, token):
+        """Refresh token"""
+
+        refresh = self.refresh_token_storage.get(token)
+        if refresh:
+            expire = datetime.now() + timedelta(seconds=self.token_lifetime)
+            refresh.context['refresh'] += 1
+            refresh.context['refresh_salt'] = urandom(120).encode('base-64')
+            new_token = self.token_type(self.app.secret_key, refresh.username, expire, **refresh.context)
+            self.token_storage.set(new_token)
+
+            return (True, new_token)
+            
 
         return (False, None)
 
