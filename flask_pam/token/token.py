@@ -29,6 +29,6 @@ class Token(object):
         """Generates token"""
         raise NotImplementedError("Token::generate must be implemented!")
 
-    def validate(self, token):
-        """Checks if provided token is valid"""
+    def validate(self, token, **validation_context):
+        """Checks if provided token is valid """
         return token == self.generate()
