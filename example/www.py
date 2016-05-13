@@ -2,12 +2,13 @@ from flask import Flask, request
 from flask_pam import Auth
 from flask_pam.token_storage import DictStorage
 from flask_pam.token import JWT
+from datetime import datetime
 import json
 import www_config
 
 app = Flask(__name__)
 app.secret_key = 'test_secret_key'
-auth = Auth(DictStorage, JWT, 60, app)
+auth = Auth(DictStorage, JWT, 60, 600, app)
 
 @app.route('/')
 def index():
@@ -45,6 +46,16 @@ def authenticate():
                     {
                         'type': 'tokens',
                         'id': result[1].generate(),
+                        'attributes': {
+                            'expire': int(result[1].expire.strftime('%s')),
+                        }
+                    },
+                    {
+                        'type': 'refresh_tokens',
+                        'id': result[2].generate(),
+                        'attributes': {
+                            'expire': int(result[2].expire.strftime('%s')),
+                        }
                     },
                     {
                         'type': 'roles',
