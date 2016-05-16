@@ -7,6 +7,10 @@ from datetime import datetime, timedelta
 from flask import request, abort
 from os import urandom
 
+import logging
+logging.basicConfig(filename='flask_pam.log', level=logging.INFO)
+log = logging.getLogger(__name__)
+
 class Auth(object):
 
     """Plugin for Flask which implements PAM authentication with tokens."""
@@ -39,12 +43,20 @@ class Auth(object):
         self.init_app(app)
         self.development = development
 
+        log.info("Auth object initialized. Token: %s, Storage: %s, token lifetime %d, refresh token lifetime %d, development: %r",
+                 self.token_type.__name__,
+                 token_storage_type.__name__,
+                 self.token_lifetime,
+                 self.refresh_token_lifetime,
+                 self.development,)
+
     def init_app(self, app):
         """Saves Flask class' instance in self.app
 
         :param app: Flask class' instance
         """
         self.app = app
+        log.info("Flask application has been initialized in Flask-PAM!")
 
     def authenticate(self, username, password, **token_context):
         """Performs authentication using simplepam
@@ -59,11 +71,15 @@ class Auth(object):
 
         :param **token_context: additional args with keys for token generator
         """
+        log.info("Trying to authenticate user: '%s'", username)
         if simplepam.authenticate(username, password):
             expire = datetime.now() + timedelta(seconds=self.token_lifetime)
+            log.info("Token will be valid to %s", expire.strftime('%c'))
+
             refresh_expire = -1
             if self.refresh_token_lifetime != -1:
                 refresh_expire = datetime.now() + timedelta(seconds=self.refresh_token_lifetime)
+                log.info("Refresh token will be valid to %s", refresh_expire.strftime('%c'))
 
             token = self.token_type(self.app.secret_key, username, expire, **token_context)
             token.context['salt'] = urandom(120).encode('base-64')
@@ -75,12 +91,14 @@ class Auth(object):
             self.token_storage.set(token)
             self.refresh_token_storage.set(refresh_token)
             return (True, token, refresh_token)
-
+    
+        log.warning("Couldn't authenticate user: %s", username)
         return (False, None, None)
 
     def refresh(self, token):
         """Refresh token"""
 
+        log.info("Trying to refresh token")
         refresh = self.refresh_token_storage.get(token)
         if refresh:
             expire = datetime.now() + timedelta(seconds=self.token_lifetime)
@@ -88,9 +106,10 @@ class Auth(object):
             new_token = self.token_type(self.app.secret_key, refresh.username, expire, **refresh.context)
             self.token_storage.set(new_token)
 
+            log.info("Token for user %s has been refreshed!", refresh.username)
             return (True, new_token)
             
-
+        log.warning("Could not refresh token!")
         return (False, None)
 
     def authenticated(self, user_token, **validation_context):
@@ -141,12 +160,18 @@ class Auth(object):
 
         :param view: Flask's view function
         """
+
         @functools.wraps(view)
         def decorated(*args, **kwargs):
+            log.info("Trying to get access to protected resource: '%s'", view.__name__)
             if request.method == 'POST':
                 token = request.form['token']
                 if self.development or self.authenticated(token):
                     return view(*args, **kwargs)
+                else:
+                    log.warning("User has not been authorized to get access to resource: %s", view.__name__)
+            else:
+                log.warning("Bad request type!")
 
             return abort(403)
 
@@ -160,13 +185,19 @@ class Auth(object):
 
         :param group: group's name
         """
+
         def decorator(view):
             @functools.wraps(view)
             def decorated(*args, **kwargs):
+                log.info("Trying to get access to resource: %s protected by group: %s", view.__name__, group)
                 if request.method == 'POST':
                     token = request.form['token']
                     if self.development or self.group_authenticated(token, group):
                         return view(*args, **kwargs)
+                    else:
+                        log.warning("User has not been authorized to get access to resource: %s", view.__name__)
+                else:
+                    log.error("Bad request type! Expected 'POST', actual '%s'", request.method)
 
                 return abort(403)
 
