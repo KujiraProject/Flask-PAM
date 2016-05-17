@@ -8,7 +8,6 @@ from flask import request, abort
 from os import urandom
 
 import logging
-logging.basicConfig(filename='flask_pam.log', level=logging.INFO)
 log = logging.getLogger(__name__)
 
 class Auth(object):
