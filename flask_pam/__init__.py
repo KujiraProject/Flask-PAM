@@ -1,3 +1,3 @@
-from auth import Auth  # pylint: disable=F401
-import token_storage  # pylint: disable=F401
-import token  # pylint: disable=F401
+from auth import Auth  # pylint: disable=unsed-import
+import token_storage  # pylint: disable=unused-import
+import token  # pylint: disable=unused-import
