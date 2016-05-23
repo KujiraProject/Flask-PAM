@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 class Token(object):
 
     """Base class for all token's implementations."""
@@ -11,7 +12,7 @@ class Token(object):
 
         :param username: user for whom token is generated
 
-        :param expire: time in seconds 
+        :param expire: time in seconds
 
         :param context: additional data used to generate token
         """
@@ -26,9 +27,9 @@ class Token(object):
         return True
 
     def generate(self):
-        """Generates token"""
+        """Generate token"""
         raise NotImplementedError("Token::generate must be implemented!")
 
     def validate(self, token, **validation_context):
-        """Checks if provided token is valid """
+        """Check if provided token is valid """
         return token == self.generate()

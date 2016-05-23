@@ -97,7 +97,7 @@ class Auth(object):
     def refresh(self, token):
         """Refresh token"""
 
-        log.info("Trying to refresh token")
+        log.info("Trying to refresh token...")
         refresh = self.refresh_token_storage.get(token)
         if refresh:
             expire = datetime.now() + timedelta(seconds=self.token_lifetime)
@@ -170,7 +170,7 @@ class Auth(object):
                 else:
                     log.warning("User has not been authorized to get access to resource: %s", view.__name__)
             else:
-                log.warning("Bad request type!")
+                log.warning("Bad request type! Expected 'POST', actual '%s'", request.method)
 
             return abort(403)
 

@@ -2,7 +2,10 @@
 
 from token import Token
 from jose import jwt
-from os import urandom
+import logging
+
+log = logging.getLogger(__name__)
+
 
 class JWT(Token):
     """JSON Web Token"""
@@ -11,12 +14,14 @@ class JWT(Token):
         super(JWT, self).__init__(*args, **kwargs)
 
         self.algorithm = 'HS256'
+        log.info("JWT (algorithm: %s) initialized!", self.algorithm)
 
     def generate(self):
         data = self.context.copy()
         data['username'] = self.username
         data['expire'] = int(self.expire.strftime('%s'))
 
+        log.info("Generating JWT for user '%s'", self.username)
         return jwt.encode(data,
                           self.secret_key,
                           algorithm=self.algorithm)
@@ -26,9 +31,9 @@ class JWT(Token):
                              self.secret_key,
                              algorithms=[self.algorithm])
 
-        if ('ip' in validation_context and
-            not context['ip'] == validation_context['ip']):
+        if 'ip' in validation_context and \
+           not context['ip'] == validation_context['ip']:
+            log.warning("Token is invalid!")
             return False
 
         return True
-        
