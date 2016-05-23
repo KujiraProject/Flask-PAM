@@ -15,7 +15,7 @@ class JWT(Token):
     def generate(self):
         data = self.context.copy()
         data['username'] = self.username
-        data['expire'] = int(self.expire.strftime('%s'))
+        data['exp'] = int(self.expire.strftime('%s'))
 
         return jwt.encode(data,
                           self.secret_key,
