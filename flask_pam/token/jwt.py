@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from token import Token
+from .token import Token
 from jose import jwt
 import logging
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from token_storage import TokenStorage
+from .token_storage import TokenStorage
 from datetime import datetime
 import logging
 
