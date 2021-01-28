@@ -1,5 +1,3 @@
-[![Code Health](https://landscape.io/github/KujiraProject/Flask-PAM/develop/landscape.svg?style=flat)](https://landscape.io/github/KujiraProject/Flask-PAM/develop)
-
 # Flask-PAM
 
 *Flask-PAM* is a plugin for Flask microframework which enables authentication
