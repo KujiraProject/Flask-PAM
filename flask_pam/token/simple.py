@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from hashlib import sha256
-from token import Token
+from .token import Token
 import logging
 
 log = logging.getLogger(__name__)
